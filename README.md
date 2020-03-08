@@ -1,5 +1,7 @@
 # RigidbodyRaycastBased-CharacterController3D-Unity
 
-A 3d raycast based rigidbody controller to move a character.
+<b>A 3d raycast based rigidbody controller to move a character.</b>
 
-<a href="https://imgflip.com/gif/3rrz8u"><img src="https://imgflip.com/embed/3rrz8u"></a>
+Rigidbody controller can walk up and and down uneven surfaces (using raycasts):
+
+![PlayerGif](https://github.com/chetan-code/RigidbodyRaycastBased-CharacterController3D-Unity/blob/master/Assets/GithubGifs/PlayerGif.gif)
