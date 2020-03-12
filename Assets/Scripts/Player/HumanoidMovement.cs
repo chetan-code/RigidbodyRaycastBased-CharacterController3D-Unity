@@ -10,7 +10,10 @@ namespace Player
         public float floorOffsetY;
         public float moveSpeed = 6f;
         public float rotateSpeed = 10f;
-
+        public bool climbing = false;
+        [Range(0.1f,1.0f)]
+        public float climbSpeedMultiplier;
+        public LayerMask ledgeLayer;
         public string animationFloatname;
 
         Rigidbody rb;
@@ -28,6 +31,7 @@ namespace Player
         // Use this for initialization
         void Start()
         {
+            climbing = false;
             playerInput = GetComponent<PlayerInput>();
             rb = GetComponent<Rigidbody>();
             anim = GetComponent<Animator>();
@@ -60,34 +64,51 @@ namespace Player
             Quaternion targetRotation = Quaternion.Slerp(transform.rotation, rot, Time.fixedDeltaTime * inputAmount * rotateSpeed);
             transform.rotation = targetRotation;
 
-   
-            // handle animation blendtree for walking
-            anim.SetFloat(animationFloatname, inputAmount, 0.2f, Time.deltaTime);
+            //Climb Ledge
+            climbing = ClimbRaycast();
+            if (climbing)
+            {
+                anim.SetBool("Climb",true);
+                Debug.Log("Reached top : " + CheckReachedTopRaycast());
+                anim.SetBool("ReachedTop", CheckReachedTopRaycast());
+            }
+            else {
+                anim.SetBool("Climb", false);
+                // handle animation blendtree for walking
+                anim.SetFloat(animationFloatname, inputAmount, 0.2f, Time.deltaTime);
+            }
         }
 
 
         private void FixedUpdate()
         {
-            // if not grounded , increase down force
-            if (FloorRaycasts(0, 0, 0.6f) == Vector3.zero)
+            if (!climbing)
             {
-                gravity += Vector3.up * Physics.gravity.y * Time.fixedDeltaTime;
+                // if not grounded , increase down force
+                if (FloorRaycasts(0, 0, 0.6f) == Vector3.zero)
+                {
+                    gravity += Vector3.up * Physics.gravity.y * Time.fixedDeltaTime;
+                }
+
+                // actual movement of the rigidbody + extra down force
+                rb.velocity = (moveDirection * moveSpeed * inputAmount) + gravity;
+
+                // find the Y position via raycasts
+                floorMovement = new Vector3(rb.position.x, FindFloor().y + floorOffsetY, rb.position.z);
+
+                // only stick to floor when grounded
+                if (FloorRaycasts(0, 0, 0.6f) != Vector3.zero && floorMovement != rb.position)
+                {
+                    // move the rigidbody to the floor
+                    rb.MovePosition(floorMovement);
+                    gravity.y = 0;
+                }
             }
+            else {
+                // actual movement of the rigidbody + extra down force
+                rb.velocity = (transform.up * moveSpeed * vertical * climbSpeedMultiplier);
 
-            // actual movement of the rigidbody + extra down force
-            rb.velocity = (moveDirection * moveSpeed * inputAmount) + gravity;
-
-            // find the Y position via raycasts
-            floorMovement = new Vector3(rb.position.x, FindFloor().y + floorOffsetY, rb.position.z);
-
-            // only stick to floor when grounded
-            if (FloorRaycasts(0, 0, 0.6f) != Vector3.zero && floorMovement != rb.position)
-            {
-                // move the rigidbody to the floor
-                rb.MovePosition(floorMovement);
-                gravity.y = 0;
             }
-
         }
 
         Vector3 FindFloor()
@@ -129,6 +150,17 @@ namespace Player
             }
             else return Vector3.zero;
         }
+
+        bool ClimbRaycast() {
+            Debug.DrawRay(transform.position + (transform.up * 0.2f), transform.forward * 0.5f, Color.cyan);
+            return Physics.Raycast(transform.position + (transform.up * 0.2f), transform.forward, 0.5f, ledgeLayer);
+        }
+
+        bool CheckReachedTopRaycast() {
+            Debug.DrawRay(transform.position + (transform.up * 1.5f), transform.forward * 0.5f, Color.red);
+            return !Physics.Raycast(transform.position + (transform.up * 1.5f), transform.forward, 0.5f, ledgeLayer);
+        }
+
 
     }
 }
