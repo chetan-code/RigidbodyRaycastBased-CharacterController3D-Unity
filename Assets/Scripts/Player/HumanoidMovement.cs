@@ -69,6 +69,7 @@ namespace Player
             if (climbing)
             {
                 anim.SetBool("Climb",true);
+                anim.SetFloat("ClimbSpeed", vertical);
                 Debug.Log("Reached top : " + CheckReachedTopRaycast());
                 anim.SetBool("ReachedTop", CheckReachedTopRaycast());
             }
@@ -85,6 +86,7 @@ namespace Player
             if (!climbing)
             {
                 // if not grounded , increase down force
+                anim.SetBool("IsGrounded", (FloorRaycasts(0, 0, 0.6f) != Vector3.zero)); 
                 if (FloorRaycasts(0, 0, 0.6f) == Vector3.zero)
                 {
                     gravity += Vector3.up * Physics.gravity.y * Time.fixedDeltaTime;
@@ -105,6 +107,7 @@ namespace Player
                 }
             }
             else {
+                anim.SetBool("IsGrounded", true);
                 // actual movement of the rigidbody + extra down force
                 rb.velocity = (transform.up * moveSpeed * vertical * climbSpeedMultiplier);
 
@@ -152,13 +155,13 @@ namespace Player
         }
 
         bool ClimbRaycast() {
-            Debug.DrawRay(transform.position + (transform.up * 0.2f), transform.forward * 0.5f, Color.cyan);
-            return Physics.Raycast(transform.position + (transform.up * 0.2f), transform.forward, 0.5f, ledgeLayer);
+            Debug.DrawRay(transform.position + (transform.up * 0.215f), transform.forward * 0.35f, Color.cyan);
+            return Physics.Raycast(transform.position + (transform.up * 0.215f), transform.forward, 0.35f, ledgeLayer);
         }
 
         bool CheckReachedTopRaycast() {
-            Debug.DrawRay(transform.position + (transform.up * 1.5f), transform.forward * 0.5f, Color.red);
-            return !Physics.Raycast(transform.position + (transform.up * 1.5f), transform.forward, 0.5f, ledgeLayer);
+            Debug.DrawRay(transform.position + (transform.up * 1.5f), transform.forward * 0.35f, Color.red);
+            return !Physics.Raycast(transform.position + (transform.up * 1.5f), transform.forward, 0.35f, ledgeLayer);
         }
 
 

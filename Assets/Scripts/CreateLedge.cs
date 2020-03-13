@@ -60,7 +60,7 @@ public class CreateLedge : MonoBehaviour
         }
         BoxCollider collider = gameObject.AddComponent<BoxCollider>();
         collider.size = new Vector3(colliderWidthX,ledgeHeight,colliderWidthZ);
-        collider.center = new Vector3(0f,((ledgeHeight/2) - colliderWidthX),0f);
+        collider.center = new Vector3(0f,((ledgeHeight/2) - colliderWidthX -(colliderWidthX/2)),0f);
     }
 
 }
