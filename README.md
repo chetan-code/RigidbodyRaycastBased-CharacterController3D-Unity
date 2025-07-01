@@ -1,5 +1,7 @@
 # RigidbodyRaycastBased-CharacterController3D-Unity
 
+UPDATED VERSION : https://github.com/chetan-code/AdvancedCharacterController3D
+
 <b>A 3d raycast based rigidbody controller to move a character.</b>
 
 Rigidbody controller can :
